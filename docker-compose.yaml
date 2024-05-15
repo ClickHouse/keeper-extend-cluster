@@ -2,21 +2,18 @@
 services:
   clickhouse:
     image: "clickhouse/clickhouse-server:latest"
-    user: "${UID:?You must do 'export UID' to launch}:65535"
+    user: &user "${UID:?You must do 'export UID' to launch}:65535"
+    restart: always
     environment:
       HOME: /tmp
     depends_on:
       - zoo1
     volumes:
-      - type: bind
-        source: ./data/clickhouse/
-        target: /var/lib/clickhouse/
-      - type: bind
-        source: ./data/clickhouse/
-        target: /var/log/clickhouse-server/
+      - ./data/clickhouse/:/var/lib/clickhouse/
+      - ./data/clickhouse/:/var/log/clickhouse-server/
       - ./configs/zookeeper.xml:/etc/clickhouse-server/config.d/zookeeper.xml:ro
       - ./initdb.d:/docker-entrypoint-initdb.d:ro
-    cap_add:
+    cap_add: &caps
       - SYS_PTRACE
       - NET_ADMIN
       - IPC_LOCK
@@ -26,26 +23,16 @@ services:
   zoo1:
     image: "clickhouse/clickhouse-keeper:latest"
     restart: always
-    user: "${UID:?You must do 'export UID' to launch}"
+    user: *user
     environment:
       HOME: /tmp
       KEEPER_ID: 1
     volumes:
-      - type: bind
-        source: ./data/zoo1
-        target: /var/lib/clickhouse-keeper
-      - type: bind
-        source: ./data/zoo1
-        target: /var/lib/clickhouse
-      - type: bind
-        source: ./data/zoo1
-        target: /var/log/clickhouse-keeper
+      - ./data/zoo1:/var/lib/clickhouse-keeper
+      - ./data/zoo1:/var/lib/clickhouse
+      - ./data/zoo1:/var/log/clickhouse-keeper
       - ./configs/keeper_single.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
-    cap_add:
-      - SYS_PTRACE
-      - NET_ADMIN
-      - IPC_LOCK
-      - SYS_NICE
+    cap_add: *caps
     networks:
       - keeper-cluster
   zoo2:
@@ -54,26 +41,16 @@ services:
       - keeper-extend
       - keeper-cluster
     restart: always
-    user: "${UID:?You must do 'export UID' to launch}"
+    user: *user
     environment:
       HOME: /tmp
       KEEPER_ID: 2
     volumes:
-      - type: bind
-        source: ./data/zoo2
-        target: /var/lib/clickhouse-keeper
-      - type: bind
-        source: ./data/zoo2
-        target: /var/lib/clickhouse
-      - type: bind
-        source: ./data/zoo2
-        target: /var/log/clickhouse-keeper
+      - ./data/zoo2:/var/lib/clickhouse-keeper
+      - ./data/zoo2:/var/lib/clickhouse
+      - ./data/zoo2:/var/log/clickhouse-keeper
       - ./configs/keeper_cluster.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
-    cap_add:
-      - SYS_PTRACE
-      - NET_ADMIN
-      - IPC_LOCK
-      - SYS_NICE
+    cap_add: *caps
     networks:
       - keeper-cluster
   zoo3:
@@ -81,26 +58,16 @@ services:
     profiles:
       - keeper-cluster
     restart: always
-    user: "${UID:?You must do 'export UID' to launch}"
+    user: *user
     environment:
       HOME: /tmp
       KEEPER_ID: 3
     volumes:
-      - type: bind
-        source: ./data/zoo3
-        target: /var/lib/clickhouse-keeper
-      - type: bind
-        source: ./data/zoo3
-        target: /var/lib/clickhouse
-      - type: bind
-        source: ./data/zoo3
-        target: /var/log/clickhouse-keeper
+      - ./data/zoo3:/var/lib/clickhouse-keeper
+      - ./data/zoo3:/var/lib/clickhouse
+      - ./data/zoo3:/var/log/clickhouse-keeper
       - ./configs/keeper_cluster.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
-    cap_add:
-      - SYS_PTRACE
-      - NET_ADMIN
-      - IPC_LOCK
-      - SYS_NICE
+    cap_add: *caps
     networks:
       - keeper-cluster
 
