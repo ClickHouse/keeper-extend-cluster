@@ -2,7 +2,7 @@
 services:
   clickhouse:
     image: "clickhouse/clickhouse-server:latest"
-    user: &user "${UID:?You must do 'export UID' to launch}:65535"
+    user: &user "${UID:?You must do 'export UID' to launch}:${GID}"
     restart: always
     environment:
       HOME: /tmp

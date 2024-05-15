@@ -2,11 +2,12 @@
 
 ## Preparation
 
-The docker-compose starts the containers with the same user ID as the current user. To do it, the next environment variable should be available:
+The docker-compose starts the containers with the same user ID as the current user. To do it, `UID` and `GID` environment variables should be added to `.env`:
 
 ```
-# Run all containers as a current user
-$ export UID=$UID
+$ make prepare
+# Or, to clean and create it
+$ make reset
 ```
 
 ### Reset the progress, clean up everything
@@ -14,8 +15,7 @@ $ export UID=$UID
 If at any stage you need to clean up the state, just run the following from the repository's root:
 
 ```
-$ git clean -fxd data/
-$ docker compose --profile keeper-cluster down --remove-orphans
+$ make reset
 ```
 
 ## Stage 1: single node keeper and its client
