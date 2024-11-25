@@ -1,4 +1,5 @@
 SELECT sleep(3); -- wait for keeper
-CREATE TABLE default.test_repliacation (val String) ENGINE=ReplicatedMergeTree('/clickhouse/tables/test_replication', 'clickhouse') PRIMARY KEY val;
+CREATE TABLE default.test_repliacation (val String) ENGINE=ReplicatedMergeTree('/clickhouse/tables/test_replication', '{replica}') PRIMARY KEY val;
 
-INSERT INTO default.test_repliacation VALUES ('1'), ('2');
+-- Insert every one replica number into the default.test_repliacation
+INSERT INTO default.test_repliacation SELECT replica_num FROM system.clusters WHERE host_name == hostName();
