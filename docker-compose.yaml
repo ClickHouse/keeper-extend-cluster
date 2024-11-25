@@ -1,7 +1,7 @@
 ---
 services:
-  clickhouse:
-    image: "clickhouse/clickhouse-server:latest"
+  clickhouse1:
+    image: "clickhouse:latest"
     user: &user "${UID:?You must do 'export UID' to launch}:${GID}"
     restart: always
     environment:
@@ -9,8 +9,8 @@ services:
     depends_on:
       - zoo1
     volumes:
-      - ./data/clickhouse/:/var/lib/clickhouse/
-      - ./data/clickhouse/:/var/log/clickhouse-server/
+      - ./data/clickhouse1/:/var/lib/clickhouse/
+      - ./data/clickhouse1/:/var/log/clickhouse-server/
       - ./configs/zookeeper.xml:/etc/clickhouse-server/config.d/zookeeper.xml:ro
       - ./initdb.d:/docker-entrypoint-initdb.d:ro
     cap_add: &caps
@@ -21,7 +21,7 @@ services:
     networks:
       - keeper-cluster
   zoo1:
-    image: "clickhouse/clickhouse-keeper:latest"
+    image: "clickhouse:latest"
     restart: always
     user: *user
     environment:
@@ -32,11 +32,14 @@ services:
       - ./data/zoo1:/var/lib/clickhouse
       - ./data/zoo1:/var/log/clickhouse-keeper
       - ./configs/keeper_single.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - ./configs/logger.xml:/etc/clickhouse-keeper/keeper_config.d/logger.xml:ro
     cap_add: *caps
+    command: &keeper-cmd |
+      clickhouse-keeper --config-file /etc/clickhouse-keeper/keeper_config.xml
     networks:
       - keeper-cluster
   zoo2:
-    image: "clickhouse/clickhouse-keeper:latest"
+    image: "clickhouse:latest"
     profiles:
       - keeper-extend
       - keeper-cluster
@@ -50,11 +53,13 @@ services:
       - ./data/zoo2:/var/lib/clickhouse
       - ./data/zoo2:/var/log/clickhouse-keeper
       - ./configs/keeper_cluster.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - ./configs/logger.xml:/etc/clickhouse-keeper/keeper_config.d/logger.xml:ro
     cap_add: *caps
+    command: *keeper-cmd
     networks:
       - keeper-cluster
   zoo3:
-    image: "clickhouse/clickhouse-keeper:latest"
+    image: "clickhouse:latest"
     profiles:
       - keeper-cluster
     restart: always
@@ -67,7 +72,9 @@ services:
       - ./data/zoo3:/var/lib/clickhouse
       - ./data/zoo3:/var/log/clickhouse-keeper
       - ./configs/keeper_cluster.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - ./configs/logger.xml:/etc/clickhouse-keeper/keeper_config.d/logger.xml:ro
     cap_add: *caps
+    command: *keeper-cmd
     networks:
       - keeper-cluster
 
