@@ -5,4 +5,16 @@
       <port>9181</port>
     </node>
   </zookeeper>
+  <allow_experimental_cluster_discovery>1</allow_experimental_cluster_discovery>
+  <remote_servers>
+    <test-autodiscovery>
+      <discovery>
+        <path>/clickhouse/discovery/test-autodiscovery</path>
+        <shard from_env="SHARD_ID" />
+      </discovery>
+    </test-autodiscovery>
+  </remote_servers>
+  <macros>
+    <replica from_env="REPLICA_ID" />
+  </macros>
 </clickhouse>

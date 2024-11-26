@@ -1,5 +1,5 @@
 <clickhouse>
-  <listen_host>::</listen_host>
+  <listen_host>0.0.0.0</listen_host>
   <keeper_server>
     <tcp_port>9181</tcp_port>
     <server_id replace="1" from_env="KEEPER_ID">1</server_id>

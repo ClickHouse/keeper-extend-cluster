@@ -31,10 +31,13 @@ $ docker compose up -d
  ✔ Container keeper-cluster-clickhouse-1  Started   0.7s
 ```
 
-At this stage, the `clickhouse-server` is connected to `zoo1` and has a ReplicatedMergeTree table `default.test_repliacation`
+At this stage, the `clickhouse-server` nodes are connected to `zoo1` and has a ReplicatedMergeTree table `default.test_repliacation`
 
 ```
-$ docker compose exec clickhouse clickhouse-client -q 'SELECT * FROM test_repliacation'
+$ docker compose exec clickhouse1 clickhouse-client -q 'SELECT * FROM test_repliacation'
+1
+2
+$ docker compose exec clickhouse2 clickhouse-client -q 'SELECT * FROM test_repliacation'
 1
 2
 ```
@@ -42,7 +45,7 @@ $ docker compose exec clickhouse clickhouse-client -q 'SELECT * FROM test_replia
 And `zoo1` node has `clickhouse` "directory" in it's root:
 
 ```
-$ docker compose exec zoo1 clickhouse-keeper-client -q 'ls /'
+$ docker compose exec zoo1 clickhouse-keeper-client -q 'ls "/"'
 clickhouse keeper
 ```
 
@@ -64,7 +67,7 @@ $ docker compose --profile keeper-extend up -d
 `zoo2` is unknown to `zoo1`. It can't join the cluster and does not work:
 
 ```
-$ docker exec -it keeper-cluster-zoo2-1 clickhouse-keeper-client -q 'ls /'
+$ docker compose exec zoo2 clickhouse-keeper-client -q 'ls "/"'
 Coordination::Exception: All connection tries failed while connecting to ZooKeeper. nodes: [::1]:9181
 Poco::Exception. Code: 1000, e.code() = 111, Connection refused (version 24.4.1.2088 (official build)), [::1]:9181
 Poco::Exception. Code: 1000, e.code() = 111, Connection refused (version 24.4.1.2088 (official build)), [::1]:9181
@@ -134,7 +137,7 @@ HB alive
 And `zoo2` works now:
 
 ```
-$ docker compose exec zoo2 clickhouse-keeper-client -q 'ls /'
+$ docker compose exec zoo2 clickhouse-keeper-client -q 'ls "/"'
 clickhouse keeper
 ```
 
@@ -153,7 +156,7 @@ $ docker compose exec zoo1 clickhouse-keeper-client -q 'reconfig ADD "server.3=z
 server.3=zoo3:9234;participant;1
 server.1=zoo1:9234;participant;1
 server.2=zoo2:9234;participant;1
-$ docker exec -it keeper-cluster-zoo3-1 clickhouse-keeper-client -q 'ls /'
+$ docker compose exec zoo3 clickhouse-keeper-client -q 'ls "/"'
 clickhouse keeper
 ```
 
