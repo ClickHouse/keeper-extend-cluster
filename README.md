@@ -31,13 +31,13 @@ $ docker compose up -d
  ✔ Container keeper-cluster-clickhouse-1  Started   0.7s
 ```
 
-At this stage, the `clickhouse-server` nodes are connected to `zoo1` and has a ReplicatedMergeTree table `default.test_repliacation`
+At this stage, the `clickhouse-server` nodes are connected to `zoo1` and has a ReplicatedMergeTree table `default.test_replication`
 
 ```
-$ docker compose exec clickhouse1 clickhouse-client -q 'SELECT * FROM test_repliacation'
+$ docker compose exec clickhouse1 clickhouse-client -q 'SELECT * FROM test_replication'
 1
 2
-$ docker compose exec clickhouse2 clickhouse-client -q 'SELECT * FROM test_repliacation'
+$ docker compose exec clickhouse2 clickhouse-client -q 'SELECT * FROM test_replication'
 1
 2
 ```
